@@ -1,0 +1,43 @@
+name: Release
+on: workflow_dispatch
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    env:
+      RUST_CHANNEL: stable
+      USE_SYSROOT_ABI: '--features sysroot-abi'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        run: |
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} rustfmt rust-src
+          rustup default ${{ env.RUST_CHANNEL }}
+          rustup target add x86_64-pc-windows-gnu 
+
+      - name: Compile (tests)
+        run: |
+          cargo test --no-run --locked ${{ env.USE_SYSROOT_ABI }}
+
+      - name: Test
+        run: |
+          cargo test ${{ env.USE_SYSROOT_ABI }} -- --nocapture --quiet
+
+      - name: Build (Windows)
+        run: |
+          cargo build --release --target=x86_64-pc-windows-gnu -v
+          
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/x86_64-pc-windows-gnu/release/remove-ts.exe
