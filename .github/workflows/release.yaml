@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ windows-latest ]
 
     steps:
       - name: Checkout
@@ -22,13 +22,12 @@ jobs:
           rustup update --no-self-update ${{ env.RUST_CHANNEL }}
           rustup component add --toolchain ${{ env.RUST_CHANNEL }} rustfmt rust-src
           rustup default ${{ env.RUST_CHANNEL }}
-          rustup target add x86_64-pc-windows-gnu 
 
       - name: Build (Windows)
         run: |
-          cargo build --release --target=x86_64-pc-windows-gnu -v
+          cargo build --release -v
           
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: target/x86_64-pc-windows-gnu/release/remove-ts.exe
+          files: target/release/remove-ts.exe
