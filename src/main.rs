@@ -1,9 +1,10 @@
 use std::env;
 use std::error::Error;
 use std::fs;
-use std::io::{self, Read};
+use std::io::Read;
+use std::path::Path;
 
-// const PATTERN:&str = "^(\d+\.*\d+\s*){2}"'";
+use regex::Regex;
 
 fn main() -> Result<(), Box<dyn Error>> {
     // Get args
@@ -14,18 +15,24 @@ fn main() -> Result<(), Box<dyn Error>> {
         panic!("Please provide remove-ts with a txt file.");
     }
 
-    let path = &args[1];
+    let mut path = args[1].clone();
 
     // Make sure file is text file
-    // todo
+    if Some("txt".as_ref()) != Path::new(&path).extension() {
+        panic!("File must be a .txt file.");
+    }
 
-    let contents = fs::read_to_string(path)
+    let contents = fs::read_to_string(path.clone())
         .unwrap_or_else(|e| panic!("Error reading file: {}", e));
 
     // Regex delete timestamps
-    // todo
+    let re = Regex::new(r#"(\d+\.*\d+\s*){2}"'"#)?;
+    let processed_contents = re.replace_all(&contents, "").to_string();
 
-
+    // Output processed file
+    path.insert_str(path.len() - 4, "-proc");
+    fs::write(&path, processed_contents)
+        .unwrap_or_else(|e| panic!("Error writing file: {}", e));
 
     Ok(())
 }
