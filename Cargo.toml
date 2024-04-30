@@ -1,0 +1,7 @@
+[package]
+name = "remove-ts"
+version = "0.1.0"
+edition = "2021"
+description = "Removes timestamps from audacity exported speed-to-text files"
+
+[dependencies]
