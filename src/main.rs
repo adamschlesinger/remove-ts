@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .unwrap_or_else(|e| panic!("Error reading file: {}", e));
 
     // Regex delete timestamps
-    let re = Regex::new(r#"(\d+\.*\d+\s*){2}"'"#)?;
+    let re = Regex::new(r#"(\d+\.*\d+\s*){2}("')*"#)?;
     let processed_contents = re.replace_all(&contents, "").to_string();
 
     // Output processed file
